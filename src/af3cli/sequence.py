@@ -607,8 +607,7 @@ def sanitize_sequence_name(name: str) -> str:
     str
         The sanitized sequence name.
     """
-    return re.sub(r'[ |:|]', '_', name).strip()
-
+    return re.sub(r'[ |:|(|)|]', '_', name).strip()
 
 def fasta2seq(filename: str) -> Generator[Sequence | None, None, None]:
     """
@@ -636,6 +635,6 @@ def fasta2seq(filename: str) -> Generator[Sequence | None, None, None]:
 
         yield Sequence(
             seq_type=seq_type,
-            seq_name=entry_name.replace(' ', '_').replace('|', '_').replace(':', '_').strip(),
+            seq_name=sanitize_sequence_name(entry_name),
             seq_str=entry_seq
         )
