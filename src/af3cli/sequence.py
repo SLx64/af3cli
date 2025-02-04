@@ -655,10 +655,13 @@ def fasta2seq(filename: str) -> Generator[Sequence | None, None, None]:
         seq_type = identify_sequence_type(entry_seq)
         if seq_type is None:
             yield None
-            continue
+            continue        
 
-        yield Sequence(
-            seq_type=seq_type,
-            seq_name=sanitize_sequence_name(entry_name),
-            seq_str=entry_seq
-        )
+        match seq_type:
+            case SequenceType.PROTEIN:
+                yield ProteinSequence(seq_str=entry_seq, seq_name=sanitize_sequence_name(entry_name))
+            case SequenceType.DNA:
+                yield DNASequence(seq_str=entry_seq, seq_name=sanitize_sequence_name(entry_name))
+            case SequenceType.RNA:
+                yield RNASequence(seq_str=entry_seq, seq_name=sanitize_sequence_name(entry_name))
+        
