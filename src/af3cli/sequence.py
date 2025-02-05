@@ -633,7 +633,7 @@ def sanitize_sequence_name(name: str) -> str:
     """
     return re.sub(r'[ |:|(|)|]', '_', name).strip()
 
-def fasta2seq(filename: str) -> Generator[Sequence | None, None, None]:
+def fasta2seq(filename: str, num: int = 1) -> Generator[Sequence | None, None, None]:
     """
     Converts a FASTA file into a sequence generator.
 
@@ -659,9 +659,9 @@ def fasta2seq(filename: str) -> Generator[Sequence | None, None, None]:
 
         match seq_type:
             case SequenceType.PROTEIN:
-                yield ProteinSequence(seq_str=entry_seq, seq_name=sanitize_sequence_name(entry_name))
+                yield ProteinSequence(seq_str=entry_seq, seq_name=sanitize_sequence_name(entry_name), num=num)
             case SequenceType.DNA:
-                yield DNASequence(seq_str=entry_seq, seq_name=sanitize_sequence_name(entry_name))
+                yield DNASequence(seq_str=entry_seq, seq_name=sanitize_sequence_name(entry_name), num=num)
             case SequenceType.RNA:
-                yield RNASequence(seq_str=entry_seq, seq_name=sanitize_sequence_name(entry_name))
+                yield RNASequence(seq_str=entry_seq, seq_name=sanitize_sequence_name(entry_name), num=num)
         

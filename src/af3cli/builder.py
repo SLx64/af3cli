@@ -3,8 +3,9 @@ from typing import Self
 from .input import InputFile
 from .seqid import IDRegister
 from .ligand import Ligand
-from .bond import Bond
 from .sequence import Sequence
+from .bond import Bond
+from .sequence import Sequence, fasta2seq
 
 
 class InputBuilder(object):
@@ -156,7 +157,10 @@ class InputBuilder(object):
         self._afinput.ligands.append(ligand)
         return self
 
-    def add_sequence(self, sequence: Sequence) -> Self:
+    def add_sequence(self, sequence: Sequence, 
+                     seq_str: str = None, 
+                     fasta_filename: str = None, 
+                     num: int = 1 ) -> Self:
         """
         Adds a sequence to the list of sequences in the `InputFile` instance.
 
@@ -164,12 +168,23 @@ class InputBuilder(object):
         ----------
         sequence : Sequence
             The sequence to be added to the list of sequences.
+        sequence_str : str, optional
+            The string representation of the sequence to be added.
+        fasta_file : str, optional
+            The path to the FASTA file containing the sequence to be added.
+        num : int, optional
+            The number of sequences to add. Defaults to 1.
 
         Returns
         -------
         Self
             Returns the current instance of the object to allow method chaining.
         """
+        if sequence is None and seq_str is not None:
+            sequence = Sequence(seq_str=seq_str, num=num)
+        elif sequence is None and fasta_filename is not None:
+            sequence =  next(fasta2seq(filename=fasta_filename, num=num))
+
         self._afinput.sequences.append(sequence)
         return self
 
