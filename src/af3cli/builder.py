@@ -168,9 +168,9 @@ class InputBuilder(object):
         ----------
         sequence : Sequence
             The sequence to be added to the list of sequences.
-        sequence_str : str, optional
+        seq_str : str, optional
             The string representation of the sequence to be added.
-        fasta_file : str, optional
+        fasta_filename : str, optional
             The path to the FASTA file containing the sequence to be added.
         num : int, optional
             The number of sequences to add. Defaults to 1.
