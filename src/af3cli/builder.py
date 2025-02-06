@@ -2,10 +2,10 @@ from typing import Self
 
 from .input import InputFile
 from .seqid import IDRegister
-from .ligand import Ligand
+from .ligand import Ligand, CCDLigand
 from .sequence import Sequence
 from .bond import Bond
-from .sequence import Sequence, fasta2seq
+from .sequence import Sequence, identify_sequence_type, fasta2seq 
 
 
 class InputBuilder(object):
@@ -140,7 +140,10 @@ class InputBuilder(object):
         self._afinput.dialect = dialect
         return self
 
-    def add_ligand(self, ligand: Ligand) -> Self:
+    def add_ligand(self, ligand: Ligand=None, 
+                   ccd_code: str = None,
+                   seq_id: list[str] | None = None,
+                   num: int = 1) -> Self:
         """
         Adds a ligand to the collection of ligands in the `InputFile` instance.
 
@@ -154,10 +157,12 @@ class InputBuilder(object):
         Self
             Returns the current instance of the object to allow method chaining.
         """
+        if ligand is None and ccd_code is not None and seq_id is not None:
+            ligand = CCDLigand([ccd_code], seq_id=seq_id, num=num)
         self._afinput.ligands.append(ligand)
         return self
 
-    def add_sequence(self, sequence: Sequence, 
+    def add_sequence(self, sequence: Sequence = None, 
                      seq_str: str = None, 
                      fasta_filename: str = None, 
                      num: int = 1 ) -> Self:
@@ -181,7 +186,8 @@ class InputBuilder(object):
             Returns the current instance of the object to allow method chaining.
         """
         if sequence is None and seq_str is not None:
-            sequence = Sequence(seq_str=seq_str, num=num)
+            seq_type = identify_sequence_type(seq_str)
+            sequence = Sequence(seq_str=seq_str, seq_type=seq_type, num=num)
         elif sequence is None and fasta_filename is not None:
             sequence =  next(fasta2seq(filename=fasta_filename, num=num))
 
