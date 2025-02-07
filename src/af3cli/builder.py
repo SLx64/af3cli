@@ -2,10 +2,10 @@ from typing import Self
 
 from .input import InputFile
 from .seqid import IDRegister
-from .ligand import Ligand, CCDLigand
+from .ligand import Ligand, CCDLigand, SMILigand
 from .sequence import Sequence
 from .bond import Bond
-from .sequence import Sequence, identify_sequence_type, fasta2seq 
+from .sequence import Sequence, identify_sequence_type, read_first_seq_fasta
 
 
 class InputBuilder(object):
@@ -140,10 +140,7 @@ class InputBuilder(object):
         self._afinput.dialect = dialect
         return self
 
-    def add_ligand(self, ligand: Ligand=None, 
-                   ccd_code: str = None,
-                   seq_id: list[str] | None = None,
-                   num: int = 1) -> Self:
+    def add_ligand(self, ligand: Ligand) -> Self:
         """
         Adds a ligand to the collection of ligands in the `InputFile` instance.
 
@@ -157,14 +154,79 @@ class InputBuilder(object):
         Self
             Returns the current instance of the object to allow method chaining.
         """
-        if ligand is None and ccd_code is not None and seq_id is not None:
-            ligand = CCDLigand([ccd_code], seq_id=seq_id, num=num)
+        return self
+    
+    def add_ligand_ccd(self, 
+                   ccd_code: str = None,
+                   seq_id: list[str] | None = None,
+                   num: int = 1) -> Self:
+        """
+        Convenience method to add a single, CCD encoded ligand to the collection of 
+        ligands in the `InputFile` instance.
+
+        Parameters
+        ----------
+        ccd_code : str 
+            The CCD (Chemical Component Dictionary) code of the ligand to be added. 
+        seq_id : list[str], optional
+            The sequence ID of the ligand to be added.
+        num : int, optional
+            The number of ligands to add. Defaults to 1.
+
+        Returns
+        -------
+        Self
+            Returns the current instance of the object to allow method chaining.
+        """
+        
+        ligand = CCDLigand([ccd_code], seq_id=seq_id, num=num)
+        self._afinput.ligands.append(ligand)
+        return self
+    
+    def add_ligand_smiles(self, 
+                   smiles_str: str | None = None,
+                   seq_id: list[str] | None = None,
+                   num: int = 1) -> Self:
+        """
+        Convenience method to add a single, SMILES encoded ligand to the collection of
+        ligands in the `InputFile` instance.
+
+        Parameters
+        ----------
+        smiles_str : str
+            The SMILES string of the ligand to be added.
+        seq_id : list[str], optional
+            The sequence ID of the ligand to be added.
+        num : int, optional
+            The number of ligands to add. Defaults to 1.
+
+        Returns
+        -------
+        Self
+            Returns the current instance of the object to allow method chaining.
+        """
+       
+        ligand = SMILigand([smiles_str], seq_id=seq_id, num=num)
         self._afinput.ligands.append(ligand)
         return self
 
-    def add_sequence(self, sequence: Sequence = None, 
-                     seq_str: str = None, 
-                     fasta_filename: str = None, 
+    def add_sequence(self, sequence: Sequence) -> Self:
+        """
+        Adds a sequence to the list of sequences in the `InputFile` instance.
+
+        Parameters
+        ----------
+        sequence : Sequence
+            The sequence to be added to the list of sequences.
+        Returns
+        -------
+        Self
+            Returns the current instance of the object to allow method chaining.
+        """
+        self._afinput.sequences.append(sequence)
+        return self
+    
+    def add_sequence_fasta(self, fasta_filename: str = None, 
                      num: int = 1 ) -> Self:
         """
         Adds a sequence to the list of sequences in the `InputFile` instance.
@@ -173,8 +235,6 @@ class InputBuilder(object):
         ----------
         sequence : Sequence
             The sequence to be added to the list of sequences.
-        seq_str : str, optional
-            The string representation of the sequence to be added.
         fasta_filename : str, optional
             The path to the FASTA file containing the sequence to be added.
         num : int, optional
@@ -185,14 +245,36 @@ class InputBuilder(object):
         Self
             Returns the current instance of the object to allow method chaining.
         """
-        if sequence is None and seq_str is not None:
-            seq_type = identify_sequence_type(seq_str)
-            sequence = Sequence(seq_str=seq_str, seq_type=seq_type, num=num)
-        elif sequence is None and fasta_filename is not None:
-            sequence =  next(fasta2seq(filename=fasta_filename, num=num))
+        
+        sequence = read_first_seq_fasta(fasta_filename, num=num)
 
         self._afinput.sequences.append(sequence)
         return self
+    
+    def add_sequence_str(self, seq_str: str = None,
+                     num: int = 1 ) -> Self:
+        """
+        Adds a sequence to the list of sequences in the `InputFile` instance.
+
+        Parameters
+        ----------
+        seq_str : str, optional
+            The string representation of the sequence to be added.
+        num : int, optional
+            The number of sequences to add. Defaults to 1.
+
+        Returns
+        -------
+        Self
+            Returns the current instance of the object to allow method chaining.
+        """
+
+        seq_type = identify_sequence_type(seq_str)
+        sequence = Sequence(seq_str=seq_str, seq_type=seq_type, num=num)
+      
+        self._afinput.sequences.append(sequence)
+        return self
+    
 
     def add_bonded_atom_pair(self, bond: Bond) -> Self:
         """
