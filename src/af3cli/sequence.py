@@ -496,6 +496,29 @@ class RNASequence(Sequence):
             modifications=modifications,
             msa=msa,
         )
+     
+    def reverse_complement(self) -> RNASequence:
+        """
+        Generates the reverse complement of the RNA sequence.
+
+        Returns
+        -------
+        RNASequence
+            A new RNASequence instance representing the reverse complement
+            of this sequence with the same sequence name and number of
+            entities.
+        """
+        cmap = {
+            'A': 'U',
+            'U': 'A',
+            'C': 'G',
+            'G': 'C'
+        }
+        complement = ''.join(cmap[base] for base in self._seq_str)
+        complement = complement[::-1]
+        return RNASequence(
+            complement, num=self._num, seq_name=self.seq_name,
+        )
 
 
 def read_fasta(filename: str) -> Generator[tuple[str, str], None, None]:
