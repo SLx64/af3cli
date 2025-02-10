@@ -5,6 +5,13 @@ class AFMissingFieldError(Exception):
     pass
 
 
+class AFSequenceTypeError(Exception):
+    """
+        Represents a custom exception for sequence-type-related errors,
+        e.g., could not automatically determine the sequence type. 
+    """
+    pass
+
 class AFSequenceError(Exception):
     """
         Represents a custom exception for sequence-related errors.

@@ -3,9 +3,10 @@ from typing import Self
 from .input import InputFile
 from .seqid import IDRegister
 from .ligand import Ligand, CCDLigand, SMILigand
-from .sequence import Sequence
+from .sequence import SequenceType, Sequence
 from .bond import Bond
 from .sequence import Sequence, identify_sequence_type, read_first_seq_fasta
+from .exception import AFSequenceTypeError
 
 
 class InputBuilder(object):
@@ -252,6 +253,7 @@ class InputBuilder(object):
         return self
     
     def add_sequence_str(self, seq_str: str = None,
+                         seq_type: SequenceType = None,
                      num: int = 1 ) -> Self:
         """
         Adds a sequence to the list of sequences in the `InputFile` instance.
@@ -268,8 +270,10 @@ class InputBuilder(object):
         Self
             Returns the current instance of the object to allow method chaining.
         """
-
-        seq_type = identify_sequence_type(seq_str)
+        if seq_type is None:
+            seq_type = identify_sequence_type(seq_str)
+        if seq_type is None:
+            raise AFSequenceTypeError("Could not automatically determine the sequence type., please specify it.")
         sequence = Sequence(seq_str=seq_str, seq_type=seq_type, num=num)
       
         self._afinput.sequences.append(sequence)
