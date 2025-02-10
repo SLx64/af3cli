@@ -583,6 +583,8 @@ def identify_sequence_type(seq_str: str) -> SequenceType | None:
 
     if is_dna and is_rna:
         return None
+    if is_dna and is_protein: # e.g. AAAGGG
+        return None
     elif is_dna:
         return SequenceType.DNA
     elif is_rna:
