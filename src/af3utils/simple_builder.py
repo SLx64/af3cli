@@ -96,6 +96,7 @@ class SimpleBuilder(InputBuilder):
         # this 
         if not add_num_to_all:
             num = 1
+            logger.warning(f"The num parameter num={num} will only be used, if add_num_to_all is set to True - as a safety feature.")
 
         for seq_tuple in read_fasta(fasta_filename):
             if sequence_type is None:
