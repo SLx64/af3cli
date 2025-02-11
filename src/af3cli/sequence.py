@@ -4,12 +4,13 @@ from enum import StrEnum
 from abc import ABCMeta
 from typing import Generator
 import re
-
+import logging
 from .mixin import DictMixin
-from .exception import (AFSequenceError, AFTemplateError,
+from .exception import (AFSequenceTypeError, AFSequenceError, AFTemplateError,
                         AFModificationError)
 from .seqid import IDRecord
 
+logger = logging.getLogger(__name__)
 
 class SequenceType(StrEnum):
     """
@@ -584,6 +585,13 @@ def identify_sequence_type(seq_str: str) -> SequenceType | None:
     Identifies the type of a given biological sequence based on its composition.
     The function examines if the sequence can be classified as DNA, RNA, or
     protein, and returns the corresponding sequence type.
+    It uses the following heuristics:
+    - If the sequence contains 'U' but not 'T', it is identified as RNA.
+    - If the sequence contains 'T' but not 'U', it is identified as DNA.
+    - If the sequence contains only protein characters, it is identified as protein.
+    - If the sequence contains only DNA characters, it is identified as DNA.
+    - If the sequence contains only RNA characters, it is identified as RNA.
+    - If the sequence contains characters from multiple sets, it is ambiguous and returns None.
 
     Parameters
     ----------
@@ -600,23 +608,51 @@ def identify_sequence_type(seq_str: str) -> SequenceType | None:
         Returns None if the sequence is ambiguous (e.g., qualifies as both DNA and RNA)
         or does not fit any of the known sequence types.
     """
-    is_protein = is_valid_sequence(SequenceType.PROTEIN, seq_str)
-    is_dna = is_valid_sequence(SequenceType.DNA, seq_str)
-    is_rna = is_valid_sequence(SequenceType.RNA, seq_str)
+    seq_str = seq_str.upper()
+    dna_chars = set("ACGT")
+    rna_chars = set("ACGU")
+    protein_chars = set("ACDEFGHIKLMNPQRSTVWY")
 
-    if is_dna and is_rna:
-        return None
-    if is_dna and is_protein: # e.g. AAAGGG
-        return None
-    elif is_dna:
+    has_u = 'U' in seq_str
+    has_t = 'T' in seq_str
+    has_protein_only = any(c in protein_chars - dna_chars - rna_chars for c in seq_str)
+
+    if has_u and not has_t:
+        if all(c in rna_chars for c in seq_str):
+            return SequenceType.RNA
+
+    if has_t and not has_u:
+        if all(c in dna_chars for c in seq_str):
+            return SequenceType.DNA
+
+    if has_protein_only:
+        if all(c in protein_chars for c in seq_str):
+            return SequenceType.PROTEIN
+
+     # Check ambiguous cases (e.g., sequences with A/T/C/G only)
+    is_dna = all(c in dna_chars for c in seq_str)
+    is_rna = all(c in rna_chars for c in seq_str)
+    is_protein = all(c in protein_chars for c in seq_str)
+
+    if is_dna:
         return SequenceType.DNA
-    elif is_rna:
+    if is_rna:
         return SequenceType.RNA
-    elif is_protein:
+    if is_protein:
         return SequenceType.PROTEIN
+    
+    possible_types = []
+    if is_dna: possible_types.append("DNA")
+    if is_rna: possible_types.append("RNA")
+    if is_protein: possible_types.append("Protein")
+    
+    if len(possible_types) > 1:
+        #raise AFSequenceTypeError(f"Ambiguous sequence: Could be {', '.join(possible_types)}")
+        logger.error(f"Ambiguous sequence: Could be {', '.join(possible_types)}")
+
     return None
 
-
+    
 def sanitize_sequence_name(name: str) -> str:
     """
     Sanitizes a sequence name by replacing unwanted characters and
