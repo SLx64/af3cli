@@ -5,7 +5,7 @@ from typing import Self
 from af3cli.builder import InputBuilder
 from af3cli.ligand import CCDLigand, SMILigand
 from af3cli.sequence import SequenceType, Sequence, read_fasta, identify_sequence_type, ProteinSequence, DNASequence, RNASequence, sanitize_sequence_name
-from af3cli.exception import AFSequenceTypeError
+from af3cli.exception import AFSequenceTypeError, AFSequenceError
 
 logger = logging.getLogger(__name__)
 
@@ -93,12 +93,14 @@ class SimpleBuilder(InputBuilder):
             Returns the current instance of the object to allow method chaining.
         """
 
-        # this 
-        if not add_num_to_all:
-            num = 1
-            logger.warning(f"The num parameter num={num} will only be used, if add_num_to_all is set to True - as a safety feature.")
+        seq_tuples = [ seq_tuple for seq_tuple in read_fasta(fasta_filename)]
 
-        for seq_tuple in read_fasta(fasta_filename):
+        if len(seq_tuples) > 1 and num > 1 and not add_num_to_all:
+            logger.warning(f"Multiple sequences found in the FASTA file {fasta_filename}.")
+            logger.warning(f"Please set add_num_to_all=True if you want to add the same number to all sequences.")
+            raise AFSequenceError("Multiple sequences found in the FASTA file. Please set add_num_to_all=True if you want to add the same number to all sequences.")
+
+        for seq_tuple in seq_tuples:
             if sequence_type is None:
                 seq_type = identify_sequence_type(seq_tuple[1])
             if seq_type is None:
