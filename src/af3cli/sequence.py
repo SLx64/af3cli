@@ -629,10 +629,21 @@ def identify_sequence_type(seq_str: str) -> SequenceType | None:
         if all(c in protein_chars for c in seq_str):
             return SequenceType.PROTEIN
 
+    possible_types = []
      # Check ambiguous cases (e.g., sequences with A/T/C/G only)
     is_dna = all(c in dna_chars for c in seq_str)
+    if is_dna: possible_types.append("DNA")
+
     is_rna = all(c in rna_chars for c in seq_str)
+    if is_rna: possible_types.append("RNA")
+
     is_protein = all(c in protein_chars for c in seq_str)
+    if is_protein: possible_types.append("Protein")
+
+    if len(possible_types) > 1:
+        #raise AFSequenceTypeError(f"Ambiguous sequence: Could be {', '.join(possible_types)}")
+        logger.error(f"Ambiguous sequence: Could be {', '.join(possible_types)} - please specify the sequence type.")
+        return None
 
     if is_dna:
         return SequenceType.DNA
@@ -640,18 +651,6 @@ def identify_sequence_type(seq_str: str) -> SequenceType | None:
         return SequenceType.RNA
     if is_protein:
         return SequenceType.PROTEIN
-    
-    possible_types = []
-    if is_dna: possible_types.append("DNA")
-    if is_rna: possible_types.append("RNA")
-    if is_protein: possible_types.append("Protein")
-    
-    if len(possible_types) > 1:
-        #raise AFSequenceTypeError(f"Ambiguous sequence: Could be {', '.join(possible_types)}")
-        logger.error(f"Ambiguous sequence: Could be {', '.join(possible_types)}")
-
-    return None
-
     
 def sanitize_sequence_name(name: str) -> str:
     """
