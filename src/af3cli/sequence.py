@@ -623,6 +623,7 @@ def identify_sequence_type(seq_str: str) -> SequenceType | None:
 
     if has_t and not has_u:
         if all(c in dna_chars for c in seq_str):
+            logger.warning(f"Based on the only presence of A, C, G, and T, the sequence\n {seq_str}\n is identified as DNA. Please verify.")
             return SequenceType.DNA
 
     if has_protein_only:
@@ -641,11 +642,15 @@ def identify_sequence_type(seq_str: str) -> SequenceType | None:
     if is_protein: possible_types.append("Protein")
 
     if len(possible_types) > 1:
-        #raise AFSequenceTypeError(f"Ambiguous sequence: Could be {', '.join(possible_types)}")
-        logger.error(f"Ambiguous sequence: Could be {', '.join(possible_types)} - please specify the sequence type.")
+        raise AFSequenceTypeError(f"Ambiguous sequence: Could be {', '.join(possible_types)}")
+        #logger.error(f"Ambiguous sequence: Could be {', '.join(possible_types)} - please specify the sequence type.")
         return None
 
+    if is_dna and is_rna:
+        raise AFSequenceTypeError("Ambiguous sequence: Could be DNA or RNA. Please specify the sequence type.")
+
     if is_dna:
+        logger.warning("Based on the only presence of A, C, G, and T, the sequence\n {seq_str}\n is identified as DNA. Please verify.")
         return SequenceType.DNA
     if is_rna:
         return SequenceType.RNA
