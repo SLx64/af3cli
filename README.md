@@ -6,10 +6,18 @@ A command-line interface and Python library for generating [AlphaFold3](https://
 We recommend using [uv](https://github.com/astral-sh/uv) to manage your installation.
 
 ```shell
+git clone https://github.com/SLx64/af3cli.git
+cd af3cli
 uv sync --locked
 ```
 
 This automatically creates a virtual environment `.venv` in the project folder and installs all dependencies. If you do not need the optional dependencies for reading SDF ([RDKit](https://github.com/rdkit/rdkit)) or FASTA files ([Biopython](https://github.com/biopython/biopython)), the installation can be prevented with `--no-group features`.
+
+The latest release is also available via [PyPI](https://pypi.org/project/af3cli/) and can be installed with `pip`. The optional dependencies must be specified here explicitly.
+
+```shell
+pip install af3cli [MDAnalysis rdkit]
+```
 
 ## Basic Usage
 
