@@ -1,6 +1,9 @@
 # af3cli Examples
 
-This directory contains example files demonstrating the usage of `af3cli` through both CLI inputs and as a Python library.
+This directory contains example files demonstrating the usage of `af3cli` through both CLI inputs and as a Python library. 
+
+> [!NOTE]
+> The CLI examples use associative arrays to improve clarity, therefore at least Bash version 4 is required.
 
 ## Example Directories and Purpose
 The examples are organized into these main directories:
