@@ -1,6 +1,6 @@
 [project]
 name = "af3cli"
-version = "0.4.0"
+version = "0.4.1"
 description = """
 A command-line interface and Python library for generating AlphaFold3 input files.
 """
