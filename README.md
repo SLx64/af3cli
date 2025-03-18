@@ -16,7 +16,7 @@ This automatically creates a virtual environment `.venv` in the project folder a
 The latest release is also available via [PyPI](https://pypi.org/project/af3cli/) and can be installed with `pip`. The optional dependencies must be specified here explicitly.
 
 ```shell
-pip install af3cli [MDAnalysis rdkit]
+pip install af3cli [biopython rdkit]
 ```
 
 ## Basic Usage
