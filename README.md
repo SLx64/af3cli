@@ -19,6 +19,12 @@ The latest release is also available via [PyPI](https://pypi.org/project/af3cli/
 pip install af3cli [biopython rdkit]
 ```
 
+## Citation
+
+Please cite the following article when using af3cli in your published work:
+
+> Döpner, P.; Kemnitz, S.; Doerr, M.; Schulig, L.; af3cli: Streamlining AlphaFold3 Input Preparation. Journal of Chemical Information and Modeling **2025**, *65* (8), 3886-3891. DOI: [10.1021/acs.jcim.5c00276](https://doi.org/10.1021/acs.jcim.5c00276) 
+
 ## Basic Usage
 
 The generation of AlphaFold3 input files can be done either with the standalone CLI tool or for more advanced tasks by using the library in Python scripts. [Python Fire](https://github.com/google/python-fire) is used to implement the CLI application.

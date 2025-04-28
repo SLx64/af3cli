@@ -9,8 +9,7 @@ from abc import ABCMeta, abstractmethod
 
 import fire
 
-from af3cli import InputFile
-from .builder import InputBuilder
+from .builder import InputFile, InputBuilder
 from .ligand import Ligand, LigandType, sdf2smiles
 from .bond import Bond
 from .sequence import Sequence, SequenceType
@@ -608,10 +607,6 @@ class ProteinCommand(SequenceCommand):
     specialized operations for handling protein-specific data, including
     templates, modifications, and multiple sequence alignment (MSA).
 
-    Attributes
-    ----------
-    _templates : list of Template
-        A list of `Template` objects that have been added to this command.
     """
     def __init__(self):
         super().__init__()

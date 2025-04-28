@@ -1,4 +1,4 @@
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 
 from .ligand import Ligand, LigandType, SMILigand, CCDLigand
 from .sequence import Sequence, SequenceType
