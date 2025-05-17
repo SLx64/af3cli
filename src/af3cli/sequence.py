@@ -144,7 +144,7 @@ class MSA(DictMixin):
             if self.paired_is_path:
                 tmp_dict["pairedMsaPath"] = self.paired
             else:
-                tmp_dict["pairedMsa"] = self.unpaired
+                tmp_dict["pairedMsa"] = self.paired
         if self.unpaired is not None:
             if self.unpaired_is_path:
                 tmp_dict["unpairedMsaPath"] = self.unpaired
