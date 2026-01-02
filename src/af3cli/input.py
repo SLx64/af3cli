@@ -195,7 +195,13 @@ class InputFile(DictMixin):
 
         for seqtype in [self.sequences, self.ligands]:
             for entry in seqtype:
-                content["sequences"].append(entry.to_dict())
+                entry_dict = entry.to_dict()
+
+                if self.version < 4:
+                    for inner in entry_dict.values():
+                        inner.pop("description", None)
+
+                content["sequences"].append(entry_dict)
 
         if len(self.bonded_atoms):
             content["bondedAtomPairs"] = []

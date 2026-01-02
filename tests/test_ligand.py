@@ -34,22 +34,25 @@ def test_ligand_init(
     assert ligand.get_id() == seq_id
 
 
-@pytest.mark.parametrize("lig_type,lig_str,seq_id",[
-    (LigandType.CCD, ["ATP"], ["A", "B"]),
-    (LigandType.SMILES, "CCC", ["A", "B"]),
-    (LigandType.SMILES, "CCC", ["A", "B"])
+@pytest.mark.parametrize("lig_type,lig_str,seq_id,desc",[
+    (LigandType.CCD, ["ATP"], ["A", "B"], "energy molecule"),
+    (LigandType.SMILES, "CCC", ["A", "B"], None),
+    (LigandType.SMILES, "CCC", ["A", "B"], "short alkane")
 ])
 def test_ligand_to_dict(
         lig_type: LigandType,
         lig_str: str,
-        seq_id: list[str] | str | None
+        seq_id: list[str] | str | None,
+        desc: str | None
 ) -> None:
-    ligand = Ligand(lig_type, lig_str, seq_id=seq_id)
+    ligand = Ligand(lig_type, lig_str, description=desc, seq_id=seq_id)
     lig_dict = ligand.to_dict()
     key, values = next(iter(lig_dict.items()))
     assert key == "ligand"
     assert values[lig_type.value] == lig_str
     assert values["id"] == seq_id
+    if desc:
+        assert values["description"] == desc
 
 
 @pytest.mark.parametrize("cls,lig_type,lig_str,num,seq_id,actual_num",[

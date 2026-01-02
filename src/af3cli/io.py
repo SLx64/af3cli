@@ -130,15 +130,19 @@ def _parse_ligand(seq_content: dict) -> Ligand:
     """
     seq_id = _get_id(seq_content)
 
+    description = seq_content.get("description")
+
     if "ccdCodes" in seq_content.keys():
         return CCDLigand(
             ligand_value=seq_content["ccdCodes"],
-            seq_id=seq_id
+            seq_id=seq_id,
+            description=description
         )
     elif "smiles" in seq_content.keys():
         return SMILigand(
             ligand_value=seq_content["smiles"],
-            seq_id=seq_id
+            seq_id=seq_id,
+            description=description
         )
     else:
         raise AFMissingFieldError(
@@ -315,10 +319,13 @@ def _parse_sequence(seq_type: str, seq_content: dict) -> Sequence:
     if seq_type != SequenceType.DNA:
         msa = _parse_msa(seq_type, seq_content)
 
+    description = seq_content.get("description")
+
     return Sequence(
         seq_type=seq_type,
         seq_str=seq_content["sequence"],
         seq_id=seq_id,
+        description=description,
         modifications=modifications,
         templates=templates,
         msa=msa,

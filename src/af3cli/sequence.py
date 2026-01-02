@@ -3,7 +3,6 @@ from __future__ import annotations
 from enum import StrEnum
 from abc import ABCMeta
 from typing import Generator
-import re
 
 from .mixin import DictMixin
 from .exception import (AFSequenceError, AFTemplateError,
@@ -250,6 +249,8 @@ class Sequence(IDRecord, DictMixin):
         The type of the sequence (e.g., Protein, DNA, RNA).
     _seq_str : str
         The string representation of the sequence.
+    description : str or None
+        Optional free-text description of the sequence entry.
     _msa : MSA or None
         The multiple sequence alignment (MSA) information, if available.
     _modifications : list of Modification
@@ -268,7 +269,7 @@ class Sequence(IDRecord, DictMixin):
         self,
         seq_type: SequenceType,
         seq_str: str,
-        seq_name: str = "",
+        description: str | None = None,
         num: int = 1,
         seq_id: list[str] | None = None,
         modifications: list[Modification] | None = None,
@@ -278,7 +279,7 @@ class Sequence(IDRecord, DictMixin):
         super().__init__(num, None)
         self._seq_str: str = seq_str
         self._seq_type: SequenceType = seq_type
-        self.seq_name: str = seq_name
+        self.description: str | None = description
 
         # will be overwritten if len(seq_id) is larger
         self.num = num
@@ -373,6 +374,8 @@ class Sequence(IDRecord, DictMixin):
         content = dict()
         content["id"] = self.get_full_id_list()
         content["sequence"] = self._seq_str
+        if self.description:
+            content["description"] = self.description
         if len(self._modifications):
             content["modifications"] = [m.to_dict() for m in self._modifications]
         if self._msa is not None:
@@ -400,7 +403,7 @@ class ProteinSequence(Sequence):
     def __init__(
         self,
         seq_str: str,
-        seq_name: str | None = None,
+        description: str | None = None,
         num: int = 1,
         seq_id: list[str] | None = None,
         modifications: list[ResidueModification] | None = None,
@@ -410,7 +413,7 @@ class ProteinSequence(Sequence):
         super().__init__(
             SequenceType.PROTEIN,
             seq_str=seq_str,
-            seq_name=seq_name,
+            description=description,
             num=num,
             seq_id=seq_id,
             modifications=modifications,
@@ -437,7 +440,7 @@ class DNASequence(Sequence):
     def __init__(
         self,
         seq_str: str,
-        seq_name: str | None = None,
+        description: str | None = None,
         num: int = 1,
         seq_id: list[str] | None = None,
         modifications: list[NucleotideModification] | None = None,
@@ -445,7 +448,7 @@ class DNASequence(Sequence):
         super().__init__(
             SequenceType.DNA,
             seq_str=seq_str,
-            seq_name=seq_name,
+            description=description,
             num=num,
             seq_id=seq_id,
             modifications=modifications,
@@ -471,7 +474,7 @@ class DNASequence(Sequence):
         complement = ''.join(cmap[base] for base in self._seq_str)
         complement = complement[::-1]
         return DNASequence(
-            complement, num=self._num, seq_name=self.seq_name,
+            complement, num=self._num, description=self.description,
         )
 
 
@@ -483,7 +486,7 @@ class RNASequence(Sequence):
     def __init__(
         self,
         seq_str: str,
-        seq_name: str | None = None,
+        description: str | None = None,
         num: int = 1,
         seq_id: list[str] | None = None,
         modifications: list[NucleotideModification] | None = None,
@@ -492,7 +495,7 @@ class RNASequence(Sequence):
         super().__init__(
             SequenceType.RNA,
             seq_str=seq_str,
-            seq_name=seq_name,
+            description=description,
             num=num,
             seq_id=seq_id,
             modifications=modifications,
@@ -594,24 +597,6 @@ def identify_sequence_type(seq_str: str) -> SequenceType | None:
     return None
 
 
-def sanitize_sequence_name(name: str) -> str:
-    """
-    Sanitizes a sequence name by replacing unwanted characters and
-    stripping whitespace.
-
-    Parameters
-    ----------
-    name : str
-        The original sequence name to be sanitized.
-
-    Returns
-    -------
-    str
-        The sanitized sequence name.
-    """
-    return re.sub(r'[ |:|]', '_', name).strip()
-
-
 def fasta2seq(filename: str) -> Generator[Sequence | None, None, None]:
     """
     Converts a FASTA file into a sequence generator.
@@ -638,6 +623,6 @@ def fasta2seq(filename: str) -> Generator[Sequence | None, None, None]:
 
         yield Sequence(
             seq_type=seq_type,
-            seq_name=entry_name.replace(' ', '_').replace('|', '_').replace(':', '_').strip(),
-            seq_str=entry_seq
+            description=entry_name.replace(' ', '_').replace('|', '_').replace(':', '_').strip(),
+            seq_str=entry_seq,
         )

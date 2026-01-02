@@ -28,7 +28,7 @@ input_builder.set_name(JOB_NAME)
 for name, fasta_sequence_string in read_fasta(INPUT_FASTA_FILEPATH):
     sequence = RNASequence(
         seq_str=fasta_sequence_string,
-        seq_name=name
+        description=name,
     )
     input_builder.add_sequence(sequence)
 

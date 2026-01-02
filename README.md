@@ -145,6 +145,47 @@ builder.add_sequence(rc_dna_seq)
 
 If modifications or manually defined IDs are required, the complementary sequence must be created separately.
 
+#### Description (optional, JSON-only comment)
+
+AlphaFold3 added the option of specifying a textual description for protein, RNA and DNA chains and ligands. In af3cli, each sequence entity can carry an optional description string. This field is only used in the JSON format and serves as a human-readable comment describing the chain. If not set, it is omitted from the JSON.
+
+**Important Note:** Older versions of the AlphaFold3 inference pipeline (version 3 or earlier) do not support the description field. Including this field in the JSON for these versions will raise a _ValueError_. To ensure compatibility, af3cli will automatically exclude the description field from the JSON file (default version = 1) or if the version is explicitly set to <= 3. This safeguard ensures seamless operation across different versions of AlphaFold3.
+
+CLI examples:
+
+```shell
+af3cli [...] \
+  - protein description "kinase domain of protein X" - add --sequence "MVKLAGST" \
+  - dna description "plasmid insert" - add --sequence "AATTTTCC" \
+  - rna description "guide RNA" - add --sequence "UUUGGCCGG"
+```
+
+Python API examples:
+
+```python
+from af3cli import ProteinSequence, DNASequence, RNASequence
+
+protein_seq = ProteinSequence("MVKLAGST", description="kinase domain of protein X")
+dna_seq = DNASequence("AATTTTCC", description="plasmid insert")
+rna_seq = RNASequence("UUUGGCCGG", description="guide RNA")
+
+builder.add_sequence(protein_seq)
+builder.add_sequence(dna_seq)
+builder.add_sequence(rna_seq)
+```
+
+Resulting JSON snippet (only shown when description is set):
+
+```json
+{
+  "protein": {
+    "id": ["A"],
+    "sequence": "MVKLAGST",
+    "description": "kinase domain of protein X"
+  }
+}
+```
+
 #### FASTA Files
 
 As it is often not very practical to add many or particularly long sequences via the CLI, it is possible to read the respective sequence from a FASTA file. To use this feature, [Biopython](https://github.com/biopython/biopython) must be installed as an optional dependency.
@@ -283,6 +324,43 @@ af3cli [...] \
     # providing a list of CCD codes is also supported
     - ligand add --ccd "MG" \
     - ligand add --sdf ligands.sdf
+```
+
+#### Description for ligands (optional, JSON-only comment)
+
+Analogous to sequences, ligands support an optional description string. This field is only written to the JSON and acts as a free-text comment. If not set, it is omitted.
+
+CLI example:
+
+```shell
+af3cli [...] \
+  - ligand description "short alkane" - add --smiles "CCC"
+```
+
+Python API examples:
+
+```python
+from af3cli import Ligand, LigandType, SMILigand, CCDLigand
+
+lig1 = Ligand(LigandType.SMILES, "CCC", description="short alkane")
+lig2 = SMILigand("CCOCC", description="ether")
+lig3 = CCDLigand(["MG"], description="magnesium ion")
+
+builder.add_ligand(lig1)
+builder.add_ligand(lig2)
+builder.add_ligand(lig3)
+```
+
+JSON snippet (only shown when description is set):
+
+```json
+{
+  "ligand": {
+    "id": ["L1"],
+    "smiles": "CCC",
+    "description": "short alkane"
+  }
+}
 ```
 
 In Python, either the parent class `Ligand` together with the respective `LigandType` or alternatively the corresponding child classes `CCDLigand` or `SMILigand` can be used to add new ligands.
