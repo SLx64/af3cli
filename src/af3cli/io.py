@@ -155,10 +155,11 @@ def _parse_modifcations(
     seq_content: dict
 ) -> list[Modification]:
     """
-    Parses the modifications present in the sequence content and generates a list of
-    modifications specific to the provided sequence type. Depending on whether the
-    sequence type is protein or rna/dna, it creates either a `ResidueModification`
-    or `NucleotideModification` object and collects these into a list.
+    Parses the modifications present in the sequence content and generates a
+    list of modifications specific to the provided sequence type. Depending on
+    whether the sequence type is protein or rna/dna, it creates either a
+    `ResidueModification` or `NucleotideModification` object and collects these
+    into a list.
 
     Parameters
     ----------
@@ -166,14 +167,15 @@ def _parse_modifcations(
         The type of the sequence, which indicates whether the sequence contains
         protein or nucleotide-related data.
     seq_content : dict
-        Dictionary containing sequence details. The key 'modifications' within this
-        dictionary holds a list of modification records, each specifying the type of
-        modification and its associated position.
+        Dictionary containing sequence details. The key 'modifications' within
+        this dictionary holds a list of modification records, each specifying
+        the type of modification and its associated position.
 
     Returns
     -------
     list[Modification]
-        A list of modifications generated based on the sequence type and content.
+        A list of modifications generated based on the sequence type and
+        content.
     """
     modifications = []
     for modification in seq_content["modifications"]:
@@ -288,13 +290,14 @@ def _parse_sequence(seq_type: str, seq_content: dict) -> Sequence:
     """
     Parses a sequence from the given sequence type and content.
 
-    This method processes a sequence from AlphaFold3 input data, including its type,
-    modifications, templates, multiple sequence alignment (MSA).
+    This method processes a sequence from AlphaFold3 input data, including
+    its type, modifications, templates, multiple sequence alignment (MSA).
 
     Parameters
     ----------
     seq_type : str
-        The type of the sequence, which should correspond to a valid sequence type.
+        The type of the sequence, which should correspond to a valid
+        sequence type.
     seq_content : dict
         Dictionary containing the sequence entry data.
 
@@ -338,16 +341,16 @@ def read_json(filename: str, check: bool = True) -> InputFile:
 
     This method reads a given JSON file to extract information about the input
     system components, such as sequences, ligands, and bonds, and creates an
-    `InputFile` object using the parsed data. It also performs some data consistency
-    checks if specified.
+    `InputFile` object using the parsed data. It also performs some data
+    consistency checks if specified.
 
     Parameters
     ----------
     filename : str
         Path to the input JSON file containing the system description.
     check : bool, optional
-        Whether to perform a data consistency check after reading the input data.
-        Default is True.
+        Whether to perform a data consistency check after reading the input
+        data. Default is True.
 
     Returns
     -------
@@ -357,8 +360,9 @@ def read_json(filename: str, check: bool = True) -> InputFile:
     Raises
     ------
     AFMissingFieldError
-        If an invalid bonded atom pair is detected in the JSON data, specifically
-        when a pair does not contain exactly two elements or is malformed.
+        If an invalid bonded atom pair is detected in the JSON data,
+        specifically when a pair does not contain exactly two elements or
+        is malformed.
     """
     data = _read(filename)
     if check:

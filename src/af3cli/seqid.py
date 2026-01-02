@@ -132,14 +132,15 @@ class IDRecord(object):
 
     def set_id(self, seq_id: list[str] | str | None) -> None:
         """
-        Set a new sequence identifier for the object. If an empty list is passed as the
-        sequence identifier, the identifier will be set to None.
+        Set a new sequence identifier for the object. If an empty list is
+        passed as the sequence identifier, the identifier will be set to None.
 
         Parameters
         ----------
         seq_id : list of str or None
-            A list of string sequence identifiers to be associated with the object. If
-            an empty list is passed, the sequence identifier is set to None.
+            A list of string sequence identifiers to be associated with the
+            object. If an empty list is passed, the sequence identifier is set
+            to None.
         """
         self._sanitize_seq_id(seq_id)
         self._sanitize_num(self._num)
@@ -203,7 +204,9 @@ class IDRegister(object):
 
         """
         if seq_id in self._registered_ids:
-            raise ValueError(f"Sequence ID {seq_id} has already been registered")
+            raise ValueError(
+                f"Sequence ID {seq_id} has already been registered"
+            )
         self._registered_ids.add(seq_id)
 
     def generate(self) -> str:

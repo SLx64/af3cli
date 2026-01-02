@@ -78,7 +78,8 @@ class Ligand(IDRecord, DictMixin):
         match self._ligand_type:
             case LigandType.CCD:
                 if isinstance(self._ligand_value, str):
-                    # otherwise the CCD name string will be treated as list of chars
+                    # otherwise the CCD name string will be treated as
+                    # list of chars
                     self._ligand_value = [self._ligand_value]
             case LigandType.SMILES:
                 if isinstance(self._ligand_value, list):
@@ -113,12 +114,19 @@ class CCDLigand(Ligand):
         seq_id: list[str] | None = None,
         description: str | None = None,
     ):
-        super().__init__(LigandType.CCD, ligand_value, num, seq_id, description=description)
+        super().__init__(
+            LigandType.CCD,
+            ligand_value,
+            num,
+            seq_id,
+            description=description
+        )
 
 
 class SMILigand(Ligand):
     """
-    Represents a ligand that uses SMILES notation to define the chemical structure.
+    Represents a ligand that uses SMILES notation to define the chemical
+    structure.
     """
     def __init__(
         self,
@@ -127,18 +135,26 @@ class SMILigand(Ligand):
         seq_id: list[str] | None = None,
         description: str | None = None,
     ):
-        super().__init__(LigandType.SMILES, ligand_value, num, seq_id, description=description)
+        super().__init__(
+            LigandType.SMILES,
+            ligand_value,
+            num,
+            seq_id,
+            description=description,
+        )
 
 
 def sdf2smiles(filename: str) -> Generator[str | None, None, None]:
     """
-    Reads a Structure Data File (SDF) and converts the molecules into SMILES format.
+    Reads a Structure Data File (SDF) and converts the molecules into
+    SMILES format.
 
-    This function uses RDKit to process the molecules in an SDF file and converts
-    them into the SMILES string representation. If any molecule cannot be read
-    from the file, it will be skipped with a warning message. The total number of
-    successfully converted molecules will be logged. If RDKit is not installed,
-    the function will terminate the program with an informative error message.
+    This function uses RDKit to process the molecules in an SDF file and
+    converts them into the SMILES string representation. If any molecule cannot
+    be read from the file, it will be skipped with a warning message. The total
+    number of successfully converted molecules will be logged. If RDKit is not
+    installed, the function will terminate the program with an informative
+    error message.
 
     Parameters
     ----------

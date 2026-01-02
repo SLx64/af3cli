@@ -73,7 +73,8 @@ class Template(DictMixin):
     def to_dict(self):
         """
         Converts the attributes of the object into a dictionary representation
-        to automatically generate the corresponding fields in the AlphaFold3 input.
+        to automatically generate the corresponding fields in the AlphaFold3
+        input.
 
         Returns
         -------
@@ -128,7 +129,8 @@ class MSA(DictMixin):
     def to_dict(self) -> dict:
         """
         Converts the attributes of the object into a dictionary representation
-        to automatically generate the corresponding fields in the AlphaFold3 input.
+        to automatically generate the corresponding fields in the AlphaFold3
+        input.
 
         Returns
         -------
@@ -256,7 +258,8 @@ class Sequence(IDRecord, DictMixin):
     _modifications : list of Modification
         Modifications associated with the sequence.
     _templates : list of Template
-        Templates associated with the sequence. Supported only for protein sequences.
+        Templates associated with the sequence. Supported only for protein
+        sequences.
     _num : int
         The number of sequences associated with the sequence ID. This value
         will be overwritten if `seq_id` is specified.
@@ -343,10 +346,10 @@ class Sequence(IDRecord, DictMixin):
         """
          Convert the object to a dictionary representation.
 
-         This method creates and returns a dictionary representation of the object,
-         including its identifier, sequence string, modifications, templates, and,
-         the multiple sequence alignment (MSA). It is used to generate the sequence
-         entries in the AlphaFold3 input file.
+         This method creates and returns a dictionary representation of the
+         object, including its identifier, sequence string, modifications,
+         templates, and, the multiple sequence alignment (MSA). It is used to
+         generate the sequence entries in the AlphaFold3 input file.
 
          Returns
          -------
@@ -377,7 +380,9 @@ class Sequence(IDRecord, DictMixin):
         if self.description:
             content["description"] = self.description
         if len(self._modifications):
-            content["modifications"] = [m.to_dict() for m in self._modifications]
+            content["modifications"] = [
+                m.to_dict() for m in self._modifications
+            ]
         if self._msa is not None:
             content |= self._msa.to_dict()
         return {self._seq_type.value: content}
@@ -538,7 +543,8 @@ def read_fasta(filename: str) -> Generator[tuple[str, str], None, None]:
 
 def is_valid_sequence(seq_type: SequenceType, seq_str: str) -> bool:
     """
-    Determines if a given sequence string corresponds to the specified sequence type.
+    Determines if a given sequence string corresponds to the specified
+    sequence type.
 
     Parameters
     ----------
@@ -579,8 +585,8 @@ def identify_sequence_type(seq_str: str) -> SequenceType | None:
         - SequenceType.DNA: If the sequence is identified as DNA.
         - SequenceType.RNA: If the sequence is identified as RNA.
         - SequenceType.PROTEIN: If the sequence is identified as protein.
-        Returns None if the sequence is ambiguous (e.g., qualifies as both DNA and RNA)
-        or does not fit any of the known sequence types.
+        Returns None if the sequence is ambiguous (e.g., qualifies as both
+        DNA and RNA) or does not fit any of the known sequence types.
     """
     is_protein = is_valid_sequence(SequenceType.PROTEIN, seq_str)
     is_dna = is_valid_sequence(SequenceType.DNA, seq_str)
@@ -597,6 +603,26 @@ def identify_sequence_type(seq_str: str) -> SequenceType | None:
     return None
 
 
+def _sanitize_description(name: str) -> str:
+    """
+    Sanitizes the input string by replacing certain characters with underscores.
+
+    Parameters
+    ----------
+    name : str
+        The input string to sanitize.
+
+    Returns
+    -------
+    str
+        The sanitized string with specified characters replaced and whitespace
+        removed.
+    """
+    for char in " |:":
+        name = name.replace(char, "_")
+    return name.strip()
+
+
 def fasta2seq(filename: str) -> Generator[Sequence | None, None, None]:
     """
     Converts a FASTA file into a sequence generator.
@@ -609,7 +635,8 @@ def fasta2seq(filename: str) -> Generator[Sequence | None, None, None]:
     Yields
     ------
     Sequence or None
-        A `Sequence` object if the sequence type can be identified; otherwise, `None`.
+        A `Sequence` object if the sequence type can be identified;
+        otherwise, `None`.
     """
     for entry_name, entry_seq in read_fasta(filename):
         if entry_seq is None:
@@ -623,6 +650,6 @@ def fasta2seq(filename: str) -> Generator[Sequence | None, None, None]:
 
         yield Sequence(
             seq_type=seq_type,
-            description=entry_name.replace(' ', '_').replace('|', '_').replace(':', '_').strip(),
+            description=_sanitize_description(entry_name),
             seq_str=entry_seq,
         )
