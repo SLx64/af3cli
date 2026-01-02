@@ -50,7 +50,8 @@ class InputBuilder(object):
 
     def reset_ids(self) -> Self:
         """
-        Resets all IDs of ligands and sequences within the current `Input` object.
+        Resets all IDs of ligands and sequences within the current `Input`
+        object.
 
         Returns
         -------
@@ -175,7 +176,8 @@ class InputBuilder(object):
 
     def add_bonded_atom_pair(self, bond: Bond) -> Self:
         """
-        Add a bonded atom pair to the corresponding list in the `InputFile` instance.
+        Add a bonded atom pair to the corresponding list in the `InputFile`
+        instance.
 
         Parameters
         ----------
